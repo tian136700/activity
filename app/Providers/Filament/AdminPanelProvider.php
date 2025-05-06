@@ -11,6 +11,7 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -54,6 +55,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->brandName("校园活动管理后台")
             ->authGuard("admin")
+            ->maxContentWidth(MaxWidth::Full)
             ->authMiddleware([
                 Authenticate::class,
             ]);
