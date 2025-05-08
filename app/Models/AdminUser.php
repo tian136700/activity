@@ -8,7 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class AdminUser extends Authenticatable
 {
     //
-
+    //黑名单设置为空
+    protected $guarded = [];
 
     public function admin()
     {

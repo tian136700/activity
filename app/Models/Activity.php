@@ -10,6 +10,9 @@ class Activity extends Model
 {
     //黑名单设置为空
     protected $guarded = [];
+    protected $casts = [
+        'images' => 'array',
+    ];
 
     /**
      * 查找活动发起人信息

@@ -18,6 +18,9 @@ class AuthorizationRequest extends FormRequest
         return [
             'username' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string', 'max:255'],
+            // 其他字段验证
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
         ];
     }
 }

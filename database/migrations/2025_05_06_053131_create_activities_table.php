@@ -4,6 +4,10 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+
+/**
+ * 活动表
+ */
 return new class extends Migration {
     /**
      * Run the migrations.
@@ -16,10 +20,12 @@ return new class extends Migration {
             $table->text('description')->nullable()->comment('活动简介');
             $table->dateTime('start_time')->comment('开始时间');
             $table->dateTime('end_time')->comment('结束时间');
+
             $table->dateTime('register_deadline')->nullable()->comment('报名截止时间');
             $table->string('location')->nullable()->comment('活动地点');
             $table->unsignedBigInteger('admin_user_id')->comment('发起人（管理员ID）');
             $table->integer('participant_limit')->nullable()->comment('报名人数限制');
+            $table->json('images')->nullable()->after('location')->comment('活动图片（多图地址）');
             $table->unsignedTinyInteger('status')->default(0)->comment('活动状态：0未开始 1进行中 2已结束');
             $table->timestamps();
 

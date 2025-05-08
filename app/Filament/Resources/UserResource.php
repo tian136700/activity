@@ -4,6 +4,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
+use App\Models\Department;
+use App\Models\Major;
+use App\Models\SchoolClass;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -61,22 +64,44 @@ class UserResource extends Resource
                     ])
                     ->nullable(),
 
-                Forms\Components\TextInput::make('department')
+                // 院系选择框
+                Forms\Components\Select::make('department_id')
                     ->label('院系')
-                    ->maxLength(255),
+                    ->options(Department::all()->pluck('name', 'id'))
+                    ->reactive() // 使得院系选择变得动态
+                    ->afterStateUpdated(fn($state, $get) => $get('major_id') && $get('class_id') && $state ? self::loadMajors($state) : null), // 调用静态方法
 
-                Forms\Components\TextInput::make('major')
+                // 专业选择框
+                Forms\Components\Select::make('major_id')
                     ->label('专业')
-                    ->maxLength(255),
+                    ->options(fn($get) => self::loadMajors($get('department_id')))
+                    ->reactive()
+                    ->afterStateUpdated(fn($state, $get) => self::loadClasses($state)),
+
+                // 班级选择框
+                Forms\Components\Select::make('class_id')
+                    ->label('班级')
+                    ->options(fn($get) => self::loadClasses($get('major_id')))
+                    ->reactive(),
 
                 Forms\Components\TextInput::make('year')
                     ->label('入学年份')
                     ->numeric(),
-
-                // Forms\Components\DateTimePicker::make('email_verified_at')
-                //     ->label('邮箱验证时间'),
             ]);
     }
+
+
+    // 将方法修改为静态方法
+    public static function loadMajors($departmentId)
+    {
+        return Major::where('department_id', $departmentId)->pluck('name', 'id');
+    }
+
+    public static function loadClasses($majorId)
+    {
+        return SchoolClass::where('major_id', $majorId)->pluck('class_number', 'id');
+    }
+
 
     /**
      * 前台列表
@@ -109,19 +134,26 @@ class UserResource extends Resource
 
                 Tables\Columns\TextColumn::make('gender')
                     ->label('性别')
-                    ->formatStateUsing(fn ($state) => match ($state) {
+                    ->formatStateUsing(fn($state) => match ($state) {
                         'male' => '男',
                         'female' => '女',
                         'other' => '其他',
                         default => '未知',
                     }),
 
-                Tables\Columns\TextColumn::make('department')
+                // 显示院系名称
+                Tables\Columns\TextColumn::make('department.name')
                     ->label('院系')
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('major')
+                // 显示专业名称
+                Tables\Columns\TextColumn::make('major.name')
                     ->label('专业')
+                    ->searchable(),
+
+                // 显示班级名称
+                Tables\Columns\TextColumn::make('class.name')
+                    ->label('班级')
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('year')
@@ -160,5 +192,14 @@ class UserResource extends Resource
         return [
             'index' => Pages\ManageUsers::route('/'),
         ];
+    }
+
+    /**
+     * 隐藏创建按钮
+     * @return bool
+     */
+    public static function canCreate(): bool
+    {
+        return false;
     }
 }

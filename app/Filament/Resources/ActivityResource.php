@@ -60,6 +60,15 @@ class ActivityResource extends Resource
                 Forms\Components\TextInput::make('participant_limit')
                     ->label('人数限制')
                     ->numeric(),
+                Forms\Components\FileUpload::make('images')
+                    ->label('活动图片/海报')
+                    ->multiple()
+                    ->image()
+                    ->directory('activities') // 上传到 storage/app/public/activities/
+                    ->reorderable()
+                    ->maxFiles(10)
+                    ->preserveFilenames()
+                    ->helperText('可上传多张活动图片，前台将按照先后顺序展示'),
 
                 Hidden::make('admin_user_id')
                     ->default(fn() => Filament::auth()->user()->id),
@@ -151,6 +160,8 @@ class ActivityResource extends Resource
     {
         return [
             'index' => Pages\ManageActivities::route('/'),
+//            'create' => Pages\CreateActivity::route('/create'),
+//            'edit' => Pages\EditActivity::route('/{record}/edit'),
         ];
     }
 }
